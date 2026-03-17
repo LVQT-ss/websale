@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ReportsService } from './reports.service.js';
 import { QueryReportDto } from './dto/query-report.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';

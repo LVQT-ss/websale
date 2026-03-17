@@ -350,10 +350,7 @@ export class CustomizeService {
       throw new ForbiddenException('You can only cancel your own requests');
     }
 
-    if (
-      request.status === 'COMPLETED' ||
-      request.status === 'CANCELLED'
-    ) {
+    if (request.status === 'COMPLETED' || request.status === 'CANCELLED') {
       throw new BadRequestException(
         `Cannot cancel a request with status: ${request.status}`,
       );
@@ -394,7 +391,8 @@ export class CustomizeService {
         senderId,
         senderType,
         content: dto.content,
-        attachments: dto.attachments as Prisma.InputJsonValue ?? Prisma.JsonNull,
+        attachments:
+          (dto.attachments as Prisma.InputJsonValue) ?? Prisma.JsonNull,
       },
     });
   }

@@ -1,4 +1,12 @@
-import { IsOptional, IsString, IsEnum, IsNumber, IsBoolean, IsIn, Min } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsNumber,
+  IsBoolean,
+  IsIn,
+  Min,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { TemplateCategory, TemplateTech } from '@prisma/client';
 import { PaginationDto } from '../../common/dto/pagination.dto.js';

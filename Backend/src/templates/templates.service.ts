@@ -110,7 +110,9 @@ export class TemplatesService {
     });
   }
 
-  async findAllAdmin(query: QueryTemplateDto): Promise<PaginatedResult<unknown>> {
+  async findAllAdmin(
+    query: QueryTemplateDto,
+  ): Promise<PaginatedResult<unknown>> {
     const where = this.buildWhereClause(query, false);
     const orderBy = this.buildOrderBy(query.sortBy);
     const page = query.page ?? 1;

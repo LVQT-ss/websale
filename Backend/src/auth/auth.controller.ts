@@ -56,7 +56,9 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE] as string | undefined;
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE] as
+      | string
+      | undefined;
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
@@ -86,7 +88,8 @@ export class AuthController {
   }
 
   private setRefreshTokenCookie(res: express.Response, token: string): void {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
 
     res.cookie(REFRESH_TOKEN_COOKIE, token, {
       httpOnly: true,

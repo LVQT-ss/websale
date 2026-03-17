@@ -77,14 +77,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('Your account has been deactivated or banned');
+      throw new ForbiddenException(
+        'Your account has been deactivated or banned',
+      );
     }
 
     return this.generateTokens(user);
@@ -115,7 +120,9 @@ export class AuthService {
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('Your account has been deactivated or banned');
+      throw new ForbiddenException(
+        'Your account has been deactivated or banned',
+      );
     }
 
     // Delete the old refresh token (rotation)
@@ -154,7 +161,11 @@ export class AuthService {
     };
   }
 
-  async generateTokens(user: { id: string; email: string; role: string }): Promise<TokenPair> {
+  async generateTokens(user: {
+    id: string;
+    email: string;
+    role: string;
+  }): Promise<TokenPair> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

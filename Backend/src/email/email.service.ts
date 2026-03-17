@@ -36,7 +36,8 @@ export class EmailService {
   }
 
   async send(options: SendMailOptions): Promise<void> {
-    const from = this.config.get<string>('SMTP_FROM') ?? 'noreply@flavortemplate.com';
+    const from =
+      this.config.get<string>('SMTP_FROM') ?? 'noreply@flavortemplate.com';
 
     if (!this.transporter) {
       this.logger.log(`[DEV EMAIL] To: ${options.to}`);
@@ -156,10 +157,7 @@ export class EmailService {
     });
   }
 
-  async sendWelcome(params: {
-    to: string;
-    fullName: string;
-  }): Promise<void> {
+  async sendWelcome(params: { to: string; fullName: string }): Promise<void> {
     await this.send({
       to: params.to,
       subject: 'Chào mừng đến với Flavor Template!',

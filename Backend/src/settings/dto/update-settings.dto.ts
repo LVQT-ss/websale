@@ -1,10 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsString,
-  ValidateNested,
-  IsDefined,
-} from 'class-validator';
+import { IsArray, IsString, ValidateNested, IsDefined } from 'class-validator';
 
 class SettingItemDto {
   @IsString()
