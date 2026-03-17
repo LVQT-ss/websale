@@ -66,7 +66,9 @@ export class ReviewsService {
         skip,
         take: limit,
         include: {
-          user: { select: { id: true, fullName: true, email: true, avatar: true } },
+          user: {
+            select: { id: true, fullName: true, email: true, avatar: true },
+          },
           template: { select: { id: true, name: true, slug: true } },
         },
       }),

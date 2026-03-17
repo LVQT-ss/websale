@@ -30,7 +30,7 @@ export default function AccountDashboardPage() {
   const { data: ordersData, isLoading } = useQuery<PaginatedResponse<Order>>({
     queryKey: ['my-orders', { page: 1, limit: 5 }],
     queryFn: async () => {
-      const res = await api.get('/orders/my?page=1&limit=5');
+      const res = await api.get('/orders?page=1&limit=5');
       return res.data;
     },
   });

@@ -44,14 +44,14 @@ export default function AdminCustomizeDetailPage() {
   const { data: request, isLoading } = useQuery({
     queryKey: ['admin', 'customize', params.id],
     queryFn: async () => {
-      const res = await api.get<{ data: CustomizeRequest }>(`/admin/customize-requests/${params.id}`);
+      const res = await api.get<{ data: CustomizeRequest }>(`/customize/${params.id}`);
       return res.data.data;
     },
   });
 
   const quoteMutation = useMutation({
     mutationFn: async () => {
-      await api.patch(`/admin/customize-requests/${params.id}/quote`, {
+      await api.patch(`/customize/${params.id}/quote`, {
         quotedPrice: Number(quotePrice),
         quotedDays: Number(quoteDays),
       });
@@ -65,7 +65,7 @@ export default function AdminCustomizeDetailPage() {
 
   const deliverMutation = useMutation({
     mutationFn: async () => {
-      await api.patch(`/admin/customize-requests/${params.id}/deliver`, {
+      await api.patch(`/customize/${params.id}/deliver`, {
         deliveryUrl,
         deliveryNote,
       });
@@ -79,7 +79,7 @@ export default function AdminCustomizeDetailPage() {
 
   const messageMutation = useMutation({
     mutationFn: async () => {
-      await api.post(`/admin/customize-requests/${params.id}/messages`, {
+      await api.post(`/customize/${params.id}/messages`, {
         content: message,
       });
     },

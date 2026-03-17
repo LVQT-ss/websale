@@ -40,7 +40,7 @@ export default function CustomizeNewPage() {
   const createRequest = useMutation({
     mutationFn: async () => {
       const filteredUrls = referenceUrls.filter((url) => url.trim() !== '');
-      const res = await api.post('/customize-requests', {
+      const res = await api.post('/customize', {
         templateId,
         requirements,
         referenceUrls: filteredUrls,

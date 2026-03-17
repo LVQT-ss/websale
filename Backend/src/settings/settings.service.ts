@@ -6,6 +6,25 @@ import { UpdateSettingsDto } from './dto/update-settings.dto.js';
 export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private readonly publicKeys = [
+    'site_name',
+    'site_description',
+    'contact_email',
+    'bank_config',
+  ];
+
+  async findPublic(): Promise<Record<string, unknown>> {
+    const settings = await this.prisma.setting.findMany({
+      where: { key: { in: this.publicKeys } },
+    });
+
+    const result: Record<string, unknown> = {};
+    for (const setting of settings) {
+      result[setting.key] = setting.value;
+    }
+    return result;
+  }
+
   async findAll(): Promise<Record<string, unknown>> {
     const settings = await this.prisma.setting.findMany();
 

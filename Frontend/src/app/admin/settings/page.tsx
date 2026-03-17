@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
         }
         return { key, value: parsedValue };
       });
-      await api.put('/admin/settings', { settings: entries });
+      await api.patch('/admin/settings', { settings: entries });
     },
     onSuccess: () => {
       toast.success('Settings saved');

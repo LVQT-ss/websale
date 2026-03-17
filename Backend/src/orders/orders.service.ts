@@ -186,7 +186,9 @@ export class OrdersService {
 
     // Verify ownership
     if (order.userId !== userId) {
-      throw new ForbiddenException('You can only download from your own orders');
+      throw new ForbiddenException(
+        'You can only download from your own orders',
+      );
     }
 
     // Verify order is PAID or COMPLETED

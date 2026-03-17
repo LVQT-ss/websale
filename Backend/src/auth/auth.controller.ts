@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Body,
   Req,
   Res,
@@ -15,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService, type UserInfo } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { UserPayload } from './interfaces/jwt-payload.interface.js';
@@ -56,7 +58,9 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE] as string | undefined;
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE] as
+      | string
+      | undefined;
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
@@ -85,8 +89,18 @@ export class AuthController {
     return this.authService.getMe(user.id);
   }
 
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(
+    @CurrentUser() user: UserPayload,
+    @Body() dto: UpdateProfileDto,
+  ): Promise<UserInfo> {
+    return this.authService.updateProfile(user.id, dto);
+  }
+
   private setRefreshTokenCookie(res: express.Response, token: string): void {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
 
     res.cookie(REFRESH_TOKEN_COOKIE, token, {
       httpOnly: true,

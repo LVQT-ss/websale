@@ -77,14 +77,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('Your account has been deactivated or banned');
+      throw new ForbiddenException(
+        'Your account has been deactivated or banned',
+      );
     }
 
     return this.generateTokens(user);
@@ -115,7 +120,9 @@ export class AuthService {
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('Your account has been deactivated or banned');
+      throw new ForbiddenException(
+        'Your account has been deactivated or banned',
+      );
     }
 
     // Delete the old refresh token (rotation)
@@ -154,7 +161,37 @@ export class AuthService {
     };
   }
 
-  async generateTokens(user: { id: string; email: string; role: string }): Promise<TokenPair> {
+  async updateProfile(
+    userId: string,
+    data: { fullName?: string; phone?: string; avatar?: string },
+  ): Promise<UserInfo> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(data.fullName !== undefined && { fullName: data.fullName }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.avatar !== undefined && { avatar: data.avatar }),
+      },
+    });
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone,
+      avatar: user.avatar,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  async generateTokens(user: {
+    id: string;
+    email: string;
+    role: string;
+  }): Promise<TokenPair> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

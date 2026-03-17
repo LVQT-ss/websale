@@ -46,7 +46,7 @@ export default function AdminReviewsPage() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.patch(`/admin/reviews/${id}/approve`);
+      await api.patch(`/reviews/${id}/approve`);
     },
     onSuccess: () => {
       toast.success('Review approved');
@@ -57,7 +57,7 @@ export default function AdminReviewsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/reviews/${id}`);
+      await api.delete(`/reviews/${id}`);
     },
     onSuccess: () => {
       toast.success('Review deleted');

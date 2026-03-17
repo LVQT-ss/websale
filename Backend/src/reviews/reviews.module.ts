@@ -7,7 +7,11 @@ import {
 } from './reviews.controller.js';
 
 @Module({
-  controllers: [TemplateReviewsController, ReviewsController, AdminReviewsController],
+  controllers: [
+    TemplateReviewsController,
+    ReviewsController,
+    AdminReviewsController,
+  ],
   providers: [ReviewsService],
   exports: [ReviewsService],
 })

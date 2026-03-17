@@ -63,10 +63,22 @@ export default function AdminReportsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'reports', startDate, endDate],
     queryFn: async () => {
-      const res = await api.get<{ data: ReportsData }>('/admin/reports', {
-        params: { startDate, endDate },
-      });
-      return res.data.data;
+      const [revenueRes, templatesRes, customersRes] = await Promise.all([
+        api.get<{ data: RevenueData[] }>('/admin/reports/revenue', {
+          params: { from: startDate, to: endDate },
+        }),
+        api.get<{ data: TopTemplate[] }>('/admin/reports/templates', {
+          params: { limit: 10 },
+        }),
+        api.get<{ data: TopCustomer[] }>('/admin/reports/customers', {
+          params: { limit: 10 },
+        }),
+      ]);
+      return {
+        revenueChart: revenueRes.data.data,
+        topTemplates: templatesRes.data.data,
+        topCustomers: customersRes.data.data,
+      } as ReportsData;
     },
   });
 

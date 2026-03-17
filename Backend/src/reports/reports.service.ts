@@ -35,7 +35,10 @@ export class ReportsService {
     });
 
     let totalRevenue = new Prisma.Decimal(0);
-    const dailyMap = new Map<string, { revenue: Prisma.Decimal; orders: number }>();
+    const dailyMap = new Map<
+      string,
+      { revenue: Prisma.Decimal; orders: number }
+    >();
 
     for (const payment of payments) {
       totalRevenue = totalRevenue.add(payment.amount);
