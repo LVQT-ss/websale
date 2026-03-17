@@ -58,7 +58,7 @@ export default function AdminCustomizePage() {
     queryFn: async () => {
       const params: Record<string, string | number> = { page, limit };
       if (status !== 'all') params.status = status;
-      const res = await api.get<{ data: PaginatedResponse<CustomizeRequest> }>('/admin/customize-requests', { params });
+      const res = await api.get<{ data: PaginatedResponse<CustomizeRequest> }>('/customize', { params });
       return res.data.data;
     },
   });

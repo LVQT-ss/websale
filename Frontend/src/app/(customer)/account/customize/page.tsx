@@ -24,7 +24,7 @@ export default function CustomizeListPage() {
   const { data, isLoading } = useQuery<PaginatedResponse<CustomizeRequest>>({
     queryKey: ['my-customize-requests'],
     queryFn: async () => {
-      const res = await api.get('/customize-requests/my');
+      const res = await api.get('/customize');
       return res.data;
     },
   });

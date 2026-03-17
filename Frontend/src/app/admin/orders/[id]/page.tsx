@@ -42,7 +42,7 @@ export default function AdminOrderDetailPage() {
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin', 'order', params.id],
     queryFn: async () => {
-      const res = await api.get<{ data: Order }>(`/admin/orders/${params.id}`);
+      const res = await api.get<{ data: Order }>(`/orders/${params.id}`);
       return res.data.data;
     },
   });

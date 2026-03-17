@@ -11,7 +11,7 @@ export default function DownloadsPage() {
   const { data, isLoading } = useQuery<PaginatedResponse<Order>>({
     queryKey: ['my-orders', 'all-paid'],
     queryFn: async () => {
-      const res = await api.get('/orders/my?status=PAID&limit=100');
+      const res = await api.get('/orders?status=PAID&limit=100');
       return res.data;
     },
   });
@@ -20,7 +20,7 @@ export default function DownloadsPage() {
   const { data: completedData } = useQuery<PaginatedResponse<Order>>({
     queryKey: ['my-orders', 'all-completed'],
     queryFn: async () => {
-      const res = await api.get('/orders/my?status=COMPLETED&limit=100');
+      const res = await api.get('/orders?status=COMPLETED&limit=100');
       return res.data;
     },
   });

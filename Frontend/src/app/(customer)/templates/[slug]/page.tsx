@@ -93,7 +93,7 @@ export default function TemplateDetailPage({
       if (isWishlisted) {
         await api.delete(`/wishlist/${template.id}`);
       } else {
-        await api.post('/wishlist', { templateId: template.id });
+        await api.post(`/wishlist/${template.id}`);
       }
     },
     onSuccess: () => {

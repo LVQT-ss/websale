@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
   const updateProfile = useMutation({
     mutationFn: async () => {
-      await api.patch('/users/me', {
+      await api.patch('/auth/profile', {
         fullName,
         phone: phone || undefined,
         avatar: avatar || undefined,

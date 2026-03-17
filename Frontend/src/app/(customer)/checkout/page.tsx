@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { CheckCircle, CreditCard, Building2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { formatVND } from '@/lib/format';
 import api from '@/lib/api';
-import type { PaymentMethod, Setting } from '@/lib/types';
+import type { PaymentMethod } from '@/lib/types';
 
 export default function CheckoutPage() {
   const user = useAuthStore((s) => s.user);
@@ -27,15 +26,15 @@ export default function CheckoutPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
 
-  const { data: settings } = useQuery<Setting[]>({
-    queryKey: ['settings', 'bank'],
+  const { data: settings } = useQuery<Record<string, unknown>>({
+    queryKey: ['settings', 'public'],
     queryFn: async () => {
       const res = await api.get('/settings');
       return res.data.data;
     },
   });
 
-  const bankInfo = settings?.find((s) => s.key === 'bank_info')?.value as
+  const bankInfo = settings?.bank_config as
     | { bankName?: string; accountNumber?: string; accountHolder?: string }
     | undefined;
 
@@ -49,15 +48,16 @@ export default function CheckoutPage() {
       });
       const order = orderRes.data.data;
 
-      // Create payment
-      await api.post('/payments', {
-        orderId: order.id,
-        method: paymentMethod,
-        amount: getTotal(),
-        ...(paymentMethod === 'BANK_TRANSFER' && receiptImage
-          ? { receiptImage }
-          : {}),
-      });
+      if (paymentMethod === 'BANK_TRANSFER') {
+        await api.post('/payments/bank-transfer', {
+          orderId: order.id,
+          ...(receiptImage ? { receiptImage } : {}),
+        });
+      } else {
+        await api.post('/payments/momo', {
+          orderId: order.id,
+        });
+      }
 
       return order;
     },

@@ -27,7 +27,7 @@ export default function OrdersPage() {
   const { data, isLoading } = useQuery<PaginatedResponse<Order>>({
     queryKey: ['my-orders', { page }],
     queryFn: async () => {
-      const res = await api.get(`/orders/my?page=${page}&limit=10`);
+      const res = await api.get(`/orders?page=${page}&limit=10`);
       return res.data;
     },
   });
