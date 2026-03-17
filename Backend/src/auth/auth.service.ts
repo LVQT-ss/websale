@@ -161,6 +161,32 @@ export class AuthService {
     };
   }
 
+  async updateProfile(
+    userId: string,
+    data: { fullName?: string; phone?: string; avatar?: string },
+  ): Promise<UserInfo> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(data.fullName !== undefined && { fullName: data.fullName }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.avatar !== undefined && { avatar: data.avatar }),
+      },
+    });
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone,
+      avatar: user.avatar,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
   async generateTokens(user: {
     id: string;
     email: string;
