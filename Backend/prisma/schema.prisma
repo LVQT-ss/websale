@@ -1,0 +1,339 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+enum TemplateCategory {
+  LANDING_PAGE
+  SAAS
+  ECOMMERCE
+  PORTFOLIO
+  BLOG
+  DASHBOARD
+  OTHER
+}
+
+enum TemplateTech {
+  NEXTJS
+  REACT
+  VUE
+  HTML_CSS
+  ASTRO
+  WORDPRESS
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum CustomizeStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  IN_PROGRESS
+  REVIEW
+  REVISION
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MOMO
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String?    @map("password_hash")
+  fullName     String     @map("full_name")
+  avatar       String?
+  phone        String?
+  role         UserRole   @default(CUSTOMER)
+  status       UserStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders            Order[]
+  payments          Payment[]
+  customizeRequests CustomizeRequest[]
+  reviews           TemplateReview[]
+  downloads         DownloadLog[]
+  wishlist          Wishlist[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   @unique @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
+
+model Template {
+  id          String @id @default(cuid())
+  slug        String @unique
+  name        String
+  description String @db.Text
+  shortDesc   String @map("short_desc")
+
+  category TemplateCategory
+  tech     TemplateTech
+
+  price         Decimal  @db.Decimal(15, 2)
+  originalPrice Decimal? @map("original_price") @db.Decimal(15, 2)
+  currency      String   @default("VND")
+
+  thumbnail   String
+  images      String[]
+  demoUrl     String   @map("demo_url")
+
+  fileUrl     String  @map("file_url")
+  fileSize    Int     @map("file_size")
+  version     String  @default("1.0.0")
+
+  metaTitle   String? @map("meta_title")
+  metaDesc    String? @map("meta_desc")
+
+  features    String[]
+  pages       Int      @default(1)
+  isActive    Boolean  @default(true) @map("is_active")
+  isFeatured  Boolean  @default(false) @map("is_featured")
+  sortOrder   Int      @default(0) @map("sort_order")
+
+  viewCount     Int @default(0) @map("view_count")
+  purchaseCount Int @default(0) @map("purchase_count")
+  avgRating     Decimal @default(0) @map("avg_rating") @db.Decimal(3, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orderItems        OrderItem[]
+  reviews           TemplateReview[]
+  customizeRequests CustomizeRequest[]
+  wishlist          Wishlist[]
+  downloads         DownloadLog[]
+
+  @@index([category])
+  @@index([tech])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@map("templates")
+}
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique @map("order_number")
+  userId      String @map("user_id")
+
+  status      OrderStatus @default(PENDING)
+  totalAmount Decimal     @map("total_amount") @db.Decimal(15, 2)
+  currency    String      @default("VND")
+
+  customerEmail String @map("customer_email")
+  customerName  String @map("customer_name")
+
+  paidAt      DateTime? @map("paid_at")
+  completedAt DateTime? @map("completed_at")
+  cancelledAt DateTime? @map("cancelled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User        @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+  payments Payment[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String @map("order_id")
+  templateId String @map("template_id")
+
+  templateName String  @map("template_name")
+  unitPrice    Decimal @map("unit_price") @db.Decimal(15, 2)
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  template Template @relation(fields: [templateId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id      String @id @default(cuid())
+  orderId String @map("order_id")
+  userId  String @map("user_id")
+
+  amount   Decimal       @db.Decimal(15, 2)
+  method   PaymentMethod
+  status   PaymentStatus @default(PENDING)
+  currency String        @default("VND")
+
+  momoTransId    String? @map("momo_trans_id")
+  bankTransRef   String? @map("bank_trans_ref")
+  receiptImage   String? @map("receipt_image")
+
+  confirmedById String?   @map("confirmed_by_id")
+  confirmedAt   DateTime? @map("confirmed_at")
+
+  paidAt    DateTime? @map("paid_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+model DownloadLog {
+  id         String @id @default(cuid())
+  userId     String @map("user_id")
+  templateId String @map("template_id")
+  orderId    String @map("order_id")
+
+  ipAddress String @map("ip_address")
+  userAgent String @map("user_agent")
+
+  downloadedAt DateTime @default(now()) @map("downloaded_at")
+
+  user     User     @relation(fields: [userId], references: [id])
+  template Template @relation(fields: [templateId], references: [id])
+
+  @@index([userId])
+  @@index([templateId])
+  @@map("download_logs")
+}
+
+model TemplateReview {
+  id         String @id @default(cuid())
+  userId     String @map("user_id")
+  templateId String @map("template_id")
+
+  rating  Int
+  content String @db.Text
+  isApproved Boolean @default(false) @map("is_approved")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id])
+  template Template @relation(fields: [templateId], references: [id])
+
+  @@unique([userId, templateId])
+  @@map("template_reviews")
+}
+
+model Wishlist {
+  id         String @id @default(cuid())
+  userId     String @map("user_id")
+  templateId String @map("template_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, templateId])
+  @@map("wishlists")
+}
+
+model CustomizeRequest {
+  id            String @id @default(cuid())
+  requestNumber String @unique @map("request_number")
+  userId        String @map("user_id")
+  templateId    String @map("template_id")
+
+  requirements String @db.Text
+  referenceUrls String[] @map("reference_urls")
+
+  quotedPrice Decimal? @map("quoted_price") @db.Decimal(15, 2)
+  quotedDays  Int?     @map("quoted_days")
+
+  status CustomizeStatus @default(PENDING)
+
+  deliveryUrl  String? @map("delivery_url")
+  deliveryNote String? @map("delivery_note") @db.Text
+
+  assignedTo String? @map("assigned_to")
+  adminNote  String? @map("admin_note") @db.Text
+
+  completedAt DateTime? @map("completed_at")
+  cancelledAt DateTime? @map("cancelled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id])
+  template Template @relation(fields: [templateId], references: [id])
+  messages CustomizeMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("customize_requests")
+}
+
+model CustomizeMessage {
+  id        String @id @default(cuid())
+  requestId String @map("request_id")
+  senderId  String @map("sender_id")
+  senderType String @map("sender_type")
+
+  content     String @db.Text
+  attachments Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  request CustomizeRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("customize_messages")
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
